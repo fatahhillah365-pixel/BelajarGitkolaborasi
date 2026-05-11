@@ -1,17 +1,29 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    // public float speed = 5f;
+    
     public PlayerData playerData;
-    public float currentHP;
+    public Slider hpSlider;
+    public Text hpText;
+
+    private float currentHP;
     private PlayerInput playerInput;
     private Vector2 moveInput;
 
     void Start()
     {
         playerInput = GetComponent<PlayerInput>();
+        currentHP = playerData.maxHP;
+
+        if (hpSlider != null)
+        {
+            hpSlider.maxValue = playerData.maxHP;
+        }
+
+        UpdateHPUI();
     }
     
     
@@ -36,12 +48,27 @@ public class PlayerController : MonoBehaviour
 
     void TakeDamage(float dmg)
     {
-        currentHP -= dmg;
+        currentHP = Mathf.Max(currentHP - dmg, 0f);
         Debug.Log("Player HP: " + currentHP);
 
-        if (currentHP <= 0)
+        UpdateHPUI();
+
+        if (currentHP <= 0f)
         {
             GameManager.Instance.GameOver();
+        }
+    }
+
+    void UpdateHPUI()
+    {
+        if (hpSlider != null)
+        {
+            hpSlider.value = currentHP;
+        }
+
+        if (hpText != null)
+        {
+            hpText.text = $"HP: {currentHP:0}/{playerData.maxHP:0}";
         }
     }
 }
